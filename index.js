@@ -1,8 +1,10 @@
 const {ApolloServer} = require('apollo-server-express');
 const express = require('express');
 const {GraphQLScalarType} = require('graphql');
+const config = require('config');
 
 const app = express();
+const PORT = config.get("port") || 4000;
 
 const typeDefs = `
     enum PhotoCategory {
@@ -140,7 +142,7 @@ async function startServer() {
     // server
     //     .listen()
     //     .then(({url}) => console.log(`GraphQL Service running on ${url}`))
-    app.listen({port: 4000}, () => console.log(`GraphQL server running http://localhost:4000${server.graphqlPath}`));
+    app.listen(PORT, () => console.log(`GraphQL server running http://localhost:${PORT}${server.graphqlPath}`));
 }
 
 startServer();
