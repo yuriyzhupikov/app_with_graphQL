@@ -1,5 +1,8 @@
-const {ApolloServer} = require('apollo-server');
+const {ApolloServer} = require('apollo-server-express');
+const express = require('express');
 const {GraphQLScalarType} = require('graphql');
+
+const app = express();
 
 const typeDefs = `
     enum PhotoCategory {
@@ -46,12 +49,12 @@ const typeDefs = `
 `;
 let _id = 0;
 
-var users = [
+const users = [
     { "githubLogin": "mHattrup", "name": "Mike Hattrup" },
     { "githubLogin": "gPlake", "name": "Glen Plake" },
     { "githubLogin": "sSchmidt", "name": "Scot Schmidt" }
 ]
-var photos = [
+const photos = [
     {
         "id": "1",
         "name": "Dropping the Heart Chute",
@@ -76,7 +79,7 @@ var photos = [
         "created": "2018-04-15T19:09:57.308Z"
     }
 ]
-var tags = [
+const tags = [
     { "photoID": "1", "userID": "gPlake" },
     { "photoID": "2", "userID": "sSchmidt" },
     { "photoID": "2", "userID": "mHattrup" },
@@ -129,10 +132,15 @@ const server = new ApolloServer({
     resolvers
 });
 
-function startServer() {
-    server
-        .listen()
-        .then(({url}) => console.log(`GraphQL Service running on ${url}`))
+app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'));
+
+async function startServer() {
+    await server.start();
+    server.applyMiddleware({app});
+    // server
+    //     .listen()
+    //     .then(({url}) => console.log(`GraphQL Service running on ${url}`))
+    app.listen({port: 4000}, () => console.log(`GraphQL server running http://localhost:4000${server.graphqlPath}`));
 }
 
 startServer();
