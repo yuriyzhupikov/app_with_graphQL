@@ -2,7 +2,6 @@ const {ApolloServer} = require('apollo-server-express');
 const express = require('express');
 const {readFileSync} = require('fs');
 const expressPlayground = require('graphql-playground-middleware-express').default;
-const {GraphQLScalarType} = require('graphql');
 const config = require('config');
 
 const app = express();
