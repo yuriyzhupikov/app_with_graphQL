@@ -1,26 +1,32 @@
 const {ApolloServer} = require('apollo-server-express');
-const express = require('express');
-const {readFileSync} = require('fs');
 const expressPlayground = require('graphql-playground-middleware-express').default;
-const config = require('config');
 
-const app = express();
-const PORT = config.get("port") || 4000;
+const express = require('express');
+const {MongoClient} = require('mongodb');
+const {readFileSync} = require('fs');
+const config = require('config');
 
 const typeDefs = readFileSync('schema/typeDefs.graphql', 'UTF-8');
 const resolvers = require('./resolvers');
 
-const server = new ApolloServer({
-    typeDefs,
-    resolvers
-});
-
-app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'));
-app.get('/playground', expressPlayground({endpoint: '/typeDefs.graphql'}));
+const PORT = config.get("port") || 4000;
 
 async function startServer() {
-    await server.start();
+    const app = express();
+    const mongoUrl = config.get('DB_HOST');
+
+    const client = await MongoClient.connect(mongoUrl, {useNewUrlParser: true});
+    const db = client.db();
+    const context = {db};
+
+    const server = new ApolloServer({typeDefs, resolvers, context});
     server.applyMiddleware({app});
+
+    app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'));
+    app.get('/playground', expressPlayground({endpoint: '/typeDefs.graphql'}));
+
+    //await server.start();
+
     // server
     //     .listen()
     //     .then(({url}) => console.log(`GraphQL Service running on ${url}`))
